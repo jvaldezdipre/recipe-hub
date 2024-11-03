@@ -60,3 +60,14 @@
   line-height: 2rem;
   margin-bottom: 2.5rem;
 }
+
+.home-trending-recipe {
+  padding: 0 7.5rem;
+}
+
+.home-trending-recipe p {
+  text-align: right;
+  color: rgba(181, 93, 81, 0.97);
+  font-size: 1.5rem;
+  font-weight: 500;
+}

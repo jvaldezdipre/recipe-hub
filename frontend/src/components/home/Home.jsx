@@ -1,5 +1,7 @@
 import Hero from "./Hero";
 import Section from "./Section";
+import TrendingRecipe from "./TrendingRecipe";
+
 import "./Home.css";
 
 const Home = () => {
@@ -7,6 +9,7 @@ const Home = () => {
     <>
       <Hero />
       <Section />
+      <TrendingRecipe />
     </>
   );
 };
