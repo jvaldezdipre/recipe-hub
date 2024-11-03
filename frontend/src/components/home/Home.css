@@ -1,0 +1,36 @@
+.home-hero {
+  display: flex;
+  justify-content: space-between;
+  padding: 9.38rem 7.5rem;
+}
+
+.hero {
+  width: 36rem;
+  height: 25.25rem;
+}
+
+.hero-title span {
+  color: rgba(181, 93, 81, 0.97);
+}
+
+.hero-text {
+  color: #878787;
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.hero-log-text {
+  color: #878787;
+  font-size: 1rem;
+  line-height: 1.625rem;
+}
+
+.hero-log-text a {
+  color: rgba(181, 93, 81, 0.97);
+  text-decoration: none;
+}
+
+.home-hero-right img {
+  width: 100%;
+  height: 100%;
+}
