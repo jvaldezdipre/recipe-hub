@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-import "./NavBar.css";
 import { useState } from "react";
+import Button from "../button/Button";
+
+import "./NavBar.css";
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -49,8 +51,8 @@ const NavBar = () => {
           </li>
         </ul>
         <div className={`login-signup-container ${isMenuOpen ? "active" : ""}`}>
-          <button className="btn small-btn secondary">Login</button>
-          <button className="btn small-btn primary">Sign Up</button>
+          <Button className="btn small-btn secondary">Login</Button>
+          <Button className="btn small-btn primary">Sign Up</Button>
         </div>
       </div>
     </nav>
