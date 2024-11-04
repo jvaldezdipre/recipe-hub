@@ -65,9 +65,14 @@
   padding: 0 7.5rem;
 }
 
-.home-trending-recipe p {
+.home-trending-recipe-view-more {
   text-align: right;
   color: rgba(181, 93, 81, 0.97);
   font-size: 1.5rem;
   font-weight: 500;
+}
+
+.home-trending-recipe-view-more:hover {
+  color: #878787;
+  cursor: pointer;
 }
