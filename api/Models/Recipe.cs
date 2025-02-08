@@ -43,14 +43,4 @@ namespace api.Models
         public int Protein { get; set; }
         public int Fat { get; set; }
     }
-
-    public class Rating
-    {
-        // wouldnt this be the foreign key for the user?
-        public int UserId { get; set; }
-        public string FullName { get; set; } = string.Empty;
-        public string? ProfilePicture { get; set; }
-        public int Score { get; set; }
-        public string? Comment { get; set; }
-    }
 }
