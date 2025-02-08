@@ -1,4 +1,5 @@
 const RecipeCard = () => {
+  //Will be passing props here
   return (
     <div className="recipe-card">
       <div className="recipe-img-container">
