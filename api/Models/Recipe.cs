@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 
 namespace api.Models
 {
@@ -7,19 +8,14 @@ namespace api.Models
     {
         [Key]
         public int Id { get; set; }
-
         [Required]
         public string Title { get; set; } = string.Empty;
-
         public string? Image { get; set; }
         public string? Description { get; set; }
-
         [Required]
         public List<string> Ingredients { get; set; } = new();
-
         [Required]
         public List<string> Instructions { get; set; } = new();
-
         public int Servings { get; set; }
         public int CookingTime { get; set; }
         public int PrepTime { get; set; }
