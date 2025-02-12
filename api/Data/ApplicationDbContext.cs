@@ -5,7 +5,7 @@ namespace api.Data
 {
     public class ApplicationDbContext : DbContext
     {
-                public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
+                public ApplicationDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions) {}
 
                 // Dbsets allows us to query and save instances of these types to the database
                 public DbSet<User> Users { get; set; }
@@ -19,8 +19,16 @@ namespace api.Data
             modelBuilder.Entity<User>()
                 .HasMany(u => u.SavedRecipes)
                 .WithMany()
-                .UsingEntity(j => j.ToTable("UserSavedRecipes")
-                .HasKey("UserId", "RecipeId"));
+                .UsingEntity<Dictionary<string, object>>("UserSavedRecipes",
+                    j => j.HasOne<Recipe>().WithMany().HasForeignKey("RecipeId"),
+                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
+                );
+
+            modelBuilder.Entity<Recipe>()
+                .HasOne(r => r.Author)
+                .WithMany(u => u.Recipes)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configure many-to-many for Cookbooks
             modelBuilder.Entity<Cookbook>()

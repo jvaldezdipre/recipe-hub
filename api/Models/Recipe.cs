@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
@@ -29,9 +30,11 @@ namespace api.Models
 
         // Foreign Key for User (Author)
         public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public User Author { get; set; } = null!;
     }
 
+
+    [Owned] // This means that NutritionFacts is a value object and will be embedded in the Recipe entity
     public class NutritionFacts
     {
         public int Calories { get; set; }
