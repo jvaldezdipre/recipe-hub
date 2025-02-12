@@ -22,7 +22,7 @@ namespace api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CookbookRecipe", b =>
+            modelBuilder.Entity("CookbookRecipes", b =>
                 {
                     b.Property<int>("CookbookId")
                         .HasColumnType("int");
@@ -34,7 +34,7 @@ namespace api.Migrations
 
                     b.HasIndex("RecipesId");
 
-                    b.ToTable("CookbookRecipes", (string)null);
+                    b.ToTable("CookbookRecipes");
                 });
 
             modelBuilder.Entity("UserSavedRecipes", b =>
@@ -190,7 +190,7 @@ namespace api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CookbookRecipe", b =>
+            modelBuilder.Entity("CookbookRecipes", b =>
                 {
                     b.HasOne("api.Models.Cookbook", null)
                         .WithMany()
@@ -201,7 +201,7 @@ namespace api.Migrations
                     b.HasOne("api.Models.Recipe", null)
                         .WithMany()
                         .HasForeignKey("RecipesId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -216,7 +216,7 @@ namespace api.Migrations
                     b.HasOne("api.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -236,13 +236,13 @@ namespace api.Migrations
                     b.HasOne("api.Models.Recipe", "Recipe")
                         .WithMany("Ratings")
                         .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("api.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Recipe");
