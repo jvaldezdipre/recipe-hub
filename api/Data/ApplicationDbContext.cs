@@ -7,7 +7,7 @@ namespace api.Data
     {
         public ApplicationDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions) {}
 
-                // Dbsets allows us to query and save instances of these types to the database
+        // Dbsets allows us to query and save instances of these types to the database
         public DbSet<User> Users { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
          public DbSet<Rating> Ratings { get; set; }
@@ -17,18 +17,19 @@ namespace api.Data
         {
             // Configure many-to-many for SavedRecipes
               modelBuilder.Entity<User>()
-        .HasMany(u => u.SavedRecipes)
-        .WithMany()
-        .UsingEntity<Dictionary<string, object>>(
-            "UserSavedRecipes",
-            j => j.HasOne<Recipe>()
-                  .WithMany()
-                  .HasForeignKey("RecipeId")
+                .HasMany(u => u.SavedRecipes)
+                .WithMany()
+                .UsingEntity<Dictionary<string, object>>(
+                    "UserSavedRecipes",
+                    j => j
+                .HasOne<Recipe>()
+                .WithMany()
+                .HasForeignKey("RecipeId")
                   // You can keep cascade on the Recipe side if desired
-                  .OnDelete(DeleteBehavior.Cascade),
-            j => j.HasOne<User>()
-                  .WithMany()
-                  .HasForeignKey("UserId")
+                .OnDelete(DeleteBehavior.Cascade),
+                    j => j.HasOne<User>()
+                .WithMany()
+                .HasForeignKey("UserId")
                   // Set to NoAction (or Restrict) to avoid multiple cascade paths
                   .OnDelete(DeleteBehavior.NoAction)
         );
