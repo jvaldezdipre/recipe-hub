@@ -14,11 +14,14 @@ namespace api.Models
         [Required]
         public string Password { get; set; } = string.Empty;
 
+        [Required]
         public string? FullName { get; set; }
 
-        public string? ProfilePicture { get; set; }
+        [MaxLength(255)]
+        public string? ProfilePicture { get; set; } = string.Empty;
 
-        public string? Bio { get; set; }
+        [MaxLength(500)]
+        public string? Bio { get; set; } = string.Empty;
 
         // Relationships
         public List<Recipe> Recipes { get; set; } = new();

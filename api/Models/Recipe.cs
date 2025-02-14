@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 
 namespace api.Models
 {
@@ -7,19 +9,14 @@ namespace api.Models
     {
         [Key]
         public int Id { get; set; }
-
         [Required]
         public string Title { get; set; } = string.Empty;
-
         public string? Image { get; set; }
         public string? Description { get; set; }
-
         [Required]
         public List<string> Ingredients { get; set; } = new();
-
         [Required]
         public List<string> Instructions { get; set; } = new();
-
         public int Servings { get; set; }
         public int CookingTime { get; set; }
         public int PrepTime { get; set; }
@@ -33,9 +30,11 @@ namespace api.Models
 
         // Foreign Key for User (Author)
         public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public User Author { get; set; } = null!;
     }
 
+
+    [Owned] // This means that NutritionFacts is a value object and will be embedded in the Recipe entity
     public class NutritionFacts
     {
         public int Calories { get; set; }
