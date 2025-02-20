@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using BCrypt.Net;
-
+using api.DTOs;
 namespace api.Controllers
 {
 
@@ -49,10 +49,22 @@ namespace api.Controllers
                 Bio = dto.Bio // Set the user's bio
             };
 
-            
             _context.Users.Add(user); // Add the user to the database
             await _context.SaveChangesAsync(); // Save the changes to the database
-            return Ok("User registered successfully"); // Return a success message
+            
+            // Return UserDto instead of full User object
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName ?? string.Empty,
+                ProfilePicture = user.ProfilePicture,
+                Bio = user.Bio
+            };
+
+
+            return Ok(userDto);
+            // return Ok("User registered successfully"); // Return a success message
         }
 
         [HttpPost("login")] // This attribute is used to specify the route for the login method
@@ -93,12 +105,22 @@ namespace api.Controllers
             // Write the JWT token to a string
             var tokenString = tokenHandler.WriteToken(token);
 
+            // Return UserDto with the token
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName ?? string.Empty,
+                ProfilePicture = user.ProfilePicture,
+                Bio = user.Bio
+            };
+
             // Return the JWT token
             return Ok(new { Token = tokenString });
         }
     }
 
-    // DTO classes for user registration and login
+    //These are input DTO classes for user registration and login
     public class UserRegisterDto
     {
         public string Email { get; set; } = string.Empty;
