@@ -22,30 +22,35 @@ namespace api.Data
         /// <param name="modelBuilder">The model builder used to construct the model for this context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure many-to-many for SavedRecipes
+            base.OnModelCreating(modelBuilder);
+
+            // Configure the many-to-many relationship between User and Recipe for saved recipes
             modelBuilder.Entity<User>()
                 .HasMany(u => u.SavedRecipes)
-                .WithMany()
+                .WithMany(r => r.SavedByUsers)
                 .UsingEntity<Dictionary<string, object>>(
                     "UserSavedRecipes",
-                    j => j
-                .HasOne<Recipe>()
-                .WithMany()
-                .HasForeignKey("RecipeId")
-                  // You can keep cascade on the Recipe side if desired
-                .OnDelete(DeleteBehavior.Cascade),
-                    j => j.HasOne<User>()
-                .WithMany()
-                .HasForeignKey("UserId")
-                  // Set to NoAction (or Restrict) to avoid multiple cascade paths
-                  .OnDelete(DeleteBehavior.NoAction)
-            );
+                    j => j.HasOne<Recipe>().WithMany().HasForeignKey("RecipeId").OnDelete(DeleteBehavior.Cascade),
+                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId").OnDelete(DeleteBehavior.NoAction)
+                );
 
+            // Configure the one-to-many relationship between User and Recipe for created recipes
             modelBuilder.Entity<Recipe>()
                 .HasOne(r => r.Author)
                 .WithMany(u => u.Recipes)
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure the owned entity type NutritionFacts
+            modelBuilder.Entity<Recipe>().OwnsOne(
+                r => r.NutritionFacts,
+                n =>
+                {
+                    n.Property(p => p.Calories);
+                    n.Property(p => p.Carbohydrates);
+                    n.Property(p => p.Protein);
+                    n.Property(p => p.Fat);
+                });
         }
     }
 }
