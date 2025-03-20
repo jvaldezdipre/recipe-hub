@@ -8,34 +8,49 @@ using System.Security.Claims;
 
 namespace api.Controllers
 {
+    /// <summary>
+    /// Controller for managing recipe-related operations in the application.
+    /// Provides endpoints for creating, retrieving, updating, and deleting recipes,
+    /// as well as saving and unsaving recipes for users.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class RecipeController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RecipeController"/> class.
+        /// </summary>
+        /// <param name="context">The database context for accessing recipe and user data.</param>
         public RecipeController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Recipe
+        /// <summary>
+        /// Gets all recipes with optional filtering by cuisine type.
+        /// </summary>
+        /// <param name="cuisine">Optional cuisine filter parameter.</param>
+        /// <returns>A list of recipes matching the filter criteria.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RecipeListItemDto>>> GetRecipes()
+        public async Task<ActionResult<IEnumerable<RecipeListItemDto>>> GetRecipes([FromQuery] string? cuisine)
         {
-            // Get the current user ID if authenticated
-            int? currentUserId = null;
-            if (User.Identity?.IsAuthenticated == true)
+            var userId = User.Identity?.IsAuthenticated == true
+                ? int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0")
+                : 0;
+
+            var query = _context.Recipes.AsQueryable();
+
+            // Apply cuisine filter if provided
+            if (!string.IsNullOrEmpty(cuisine))
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
-                {
-                    currentUserId = userId;
-                }
+                query = query.Where(r => r.Cuisine == cuisine);
             }
 
-            var recipes = await _context.Recipes
+            var recipes = await query
                 .Include(r => r.Author)
+                .Include(r => r.SavedByUsers)
                 .Select(r => new RecipeListItemDto
                 {
                     Id = r.Id,
@@ -45,88 +60,77 @@ namespace api.Controllers
                     Cuisine = r.Cuisine,
                     CookingTime = r.CookingTime,
                     AuthorName = r.Author.FullName ?? r.Author.Email,
-                    IsSaved = currentUserId.HasValue && 
-                        _context.Set<Dictionary<string, object>>("UserSavedRecipes")
-                            .Any(usr => EF.Property<int>(usr, "UserId") == currentUserId.Value && 
-                                  EF.Property<int>(usr, "RecipeId") == r.Id)
+                    IsSaved = userId != 0 && r.SavedByUsers.Any(u => u.Id == userId)
                 })
                 .ToListAsync();
 
             return recipes;
         }
 
-        // GET: api/Recipe/5
+        /// <summary>
+        /// Gets a specific recipe by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the recipe to retrieve.</param>
+        /// <returns>The requested recipe details.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDto>> GetRecipe(int id)
         {
+            var userId = User.Identity?.IsAuthenticated == true
+                ? int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0")
+                : 0;
+
             var recipe = await _context.Recipes
                 .Include(r => r.Author)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .Include(r => r.SavedByUsers)
+                .Where(r => r.Id == id)
+                .Select(r => new RecipeDto
+                {
+                    Id = r.Id,
+                    Title = r.Title,
+                    Image = r.Image,
+                    Description = r.Description,
+                    Ingredients = r.Ingredients,
+                    Instructions = r.Instructions,
+                    Servings = r.Servings,
+                    CookingTime = r.CookingTime,
+                    PrepTime = r.PrepTime,
+                    Cuisine = r.Cuisine,
+                    Nutrition = r.NutritionFacts != null ? new NutritionDto
+                    {
+                        Calories = r.NutritionFacts.Calories,
+                        Carbohydrates = r.NutritionFacts.Carbohydrates,
+                        Protein = r.NutritionFacts.Protein,
+                        Fat = r.NutritionFacts.Fat
+                    } : null,
+                    Author = new UserDto
+                    {
+                        Id = r.Author.Id,
+                        Email = r.Author.Email,
+                        FullName = r.Author.FullName ?? string.Empty,
+                        ProfilePicture = r.Author.ProfilePicture,
+                        Bio = r.Author.Bio
+                    },
+                    IsSaved = userId != 0 && r.SavedByUsers.Any(u => u.Id == userId)
+                })
+                .FirstOrDefaultAsync();
 
             if (recipe == null)
             {
                 return NotFound();
             }
 
-            // Get the current user ID if authenticated
-            int? currentUserId = null;
-            if (User.Identity?.IsAuthenticated == true)
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
-                {
-                    currentUserId = userId;
-                }
-            }
-
-            // Check if recipe is saved by current user
-            bool isSaved = false;
-            if (currentUserId.HasValue)
-            {
-                isSaved = await _context.Set<Dictionary<string, object>>("UserSavedRecipes")
-                    .AnyAsync(usr => EF.Property<int>(usr, "UserId") == currentUserId.Value && 
-                                    EF.Property<int>(usr, "RecipeId") == recipe.Id);
-            }
-
-            var recipeDto = new RecipeDto
-            {
-                Id = recipe.Id,
-                Title = recipe.Title,
-                Image = recipe.Image,
-                Description = recipe.Description,
-                Ingredients = recipe.Ingredients,
-                Instructions = recipe.Instructions,
-                Servings = recipe.Servings,
-                CookingTime = recipe.CookingTime,
-                PrepTime = recipe.PrepTime,
-                Cuisine = recipe.Cuisine,
-                Nutrition = recipe.Nutrition != null ? new NutritionDto
-                {
-                    Calories = recipe.Nutrition.Calories,
-                    Carbohydrates = recipe.Nutrition.Carbohydrates,
-                    Protein = recipe.Nutrition.Protein,
-                    Fat = recipe.Nutrition.Fat
-                } : null,
-                Author = new UserDto
-                {
-                    Id = recipe.Author.Id,
-                    Email = recipe.Author.Email,
-                    FullName = recipe.Author.FullName ?? string.Empty,
-                    ProfilePicture = recipe.Author.ProfilePicture,
-                    Bio = recipe.Author.Bio
-                },
-                IsSaved = isSaved
-            };
-
-            return recipeDto;
+            return recipe;
         }
 
-        // POST: api/Recipe
+        /// <summary>
+        /// Creates a new recipe for the authenticated user.
+        /// </summary>
+        /// <param name="dto">The recipe data to create.</param>
+        /// <returns>The newly created recipe.</returns>
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<RecipeDto>> CreateRecipe(CreateRecipeDto createRecipeDto)
+        public async Task<ActionResult<RecipeDto>> CreateRecipe(CreateRecipeDto dto)
         {
-            // Get the current user ID
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
             {
                 return Unauthorized();
@@ -140,24 +144,29 @@ namespace api.Controllers
 
             var recipe = new Recipe
             {
-                Title = createRecipeDto.Title,
-                Image = createRecipeDto.Image,
-                Description = createRecipeDto.Description,
-                Ingredients = createRecipeDto.Ingredients,
-                Instructions = createRecipeDto.Instructions,
-                Servings = createRecipeDto.Servings,
-                CookingTime = createRecipeDto.CookingTime,
-                PrepTime = createRecipeDto.PrepTime,
-                Cuisine = createRecipeDto.Cuisine,
+                Title = dto.Title,
+                Image = dto.Image,
+                Description = dto.Description,
+                Ingredients = dto.Ingredients,
+                Instructions = dto.Instructions,
+                Servings = dto.Servings,
+                CookingTime = dto.CookingTime,
+                PrepTime = dto.PrepTime,
+                Cuisine = dto.Cuisine,
                 UserId = userId,
-                Nutrition = createRecipeDto.Nutrition != null ? new NutritionFacts
-                {
-                    Calories = createRecipeDto.Nutrition.Calories,
-                    Carbohydrates = createRecipeDto.Nutrition.Carbohydrates,
-                    Protein = createRecipeDto.Nutrition.Protein,
-                    Fat = createRecipeDto.Nutrition.Fat
-                } : null
+                Author = user
             };
+
+            if (dto.Nutrition != null)
+            {
+                recipe.NutritionFacts = new NutritionFacts
+                {
+                    Calories = dto.Nutrition.Calories,
+                    Carbohydrates = dto.Nutrition.Carbohydrates,
+                    Protein = dto.Nutrition.Protein,
+                    Fat = dto.Nutrition.Fat
+                };
+            }
 
             _context.Recipes.Add(recipe);
             await _context.SaveChangesAsync();
@@ -174,7 +183,13 @@ namespace api.Controllers
                 CookingTime = recipe.CookingTime,
                 PrepTime = recipe.PrepTime,
                 Cuisine = recipe.Cuisine,
-                Nutrition = createRecipeDto.Nutrition,
+                Nutrition = recipe.NutritionFacts != null ? new NutritionDto
+                {
+                    Calories = recipe.NutritionFacts.Calories,
+                    Carbohydrates = recipe.NutritionFacts.Carbohydrates,
+                    Protein = recipe.NutritionFacts.Protein,
+                    Fat = recipe.NutritionFacts.Fat
+                } : null,
                 Author = new UserDto
                 {
                     Id = user.Id,
@@ -189,12 +204,16 @@ namespace api.Controllers
             return CreatedAtAction(nameof(GetRecipe), new { id = recipe.Id }, recipeDto);
         }
 
-        // PUT: api/Recipe/5
+        /// <summary>
+        /// Updates an existing recipe owned by the authenticated user.
+        /// </summary>
+        /// <param name="id">The ID of the recipe to update.</param>
+        /// <param name="dto">The updated recipe data.</param>
+        /// <returns>No content if the update is successful.</returns>
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> UpdateRecipe(int id, UpdateRecipeDto updateRecipeDto)
+        public async Task<IActionResult> UpdateRecipe(int id, UpdateRecipeDto dto)
         {
-            // Get the current user ID
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
             {
                 return Unauthorized();
@@ -206,66 +225,48 @@ namespace api.Controllers
                 return NotFound();
             }
 
-            // Check if the user is the author of the recipe
             if (recipe.UserId != userId)
             {
                 return Forbid();
             }
 
-            // Update recipe properties
-            recipe.Title = updateRecipeDto.Title;
-            recipe.Image = updateRecipeDto.Image;
-            recipe.Description = updateRecipeDto.Description;
-            recipe.Ingredients = updateRecipeDto.Ingredients;
-            recipe.Instructions = updateRecipeDto.Instructions;
-            recipe.Servings = updateRecipeDto.Servings;
-            recipe.CookingTime = updateRecipeDto.CookingTime;
-            recipe.PrepTime = updateRecipeDto.PrepTime;
-            recipe.Cuisine = updateRecipeDto.Cuisine;
-            
-            // Update nutrition facts
-            if (updateRecipeDto.Nutrition != null)
+            recipe.Title = dto.Title;
+            recipe.Image = dto.Image;
+            recipe.Description = dto.Description;
+            recipe.Ingredients = dto.Ingredients;
+            recipe.Instructions = dto.Instructions;
+            recipe.Servings = dto.Servings;
+            recipe.CookingTime = dto.CookingTime;
+            recipe.PrepTime = dto.PrepTime;
+            recipe.Cuisine = dto.Cuisine;
+
+            if (dto.Nutrition != null)
             {
-                recipe.Nutrition = new NutritionFacts
-                {
-                    Calories = updateRecipeDto.Nutrition.Calories,
-                    Carbohydrates = updateRecipeDto.Nutrition.Carbohydrates,
-                    Protein = updateRecipeDto.Nutrition.Protein,
-                    Fat = updateRecipeDto.Nutrition.Fat
-                };
+                recipe.NutritionFacts ??= new NutritionFacts();
+                recipe.NutritionFacts.Calories = dto.Nutrition.Calories;
+                recipe.NutritionFacts.Carbohydrates = dto.Nutrition.Carbohydrates;
+                recipe.NutritionFacts.Protein = dto.Nutrition.Protein;
+                recipe.NutritionFacts.Fat = dto.Nutrition.Fat;
             }
             else
             {
-                recipe.Nutrition = null;
+                recipe.NutritionFacts = null;
             }
 
-            _context.Entry(recipe).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RecipeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // DELETE: api/Recipe/5
+        /// <summary>
+        /// Deletes a recipe owned by the authenticated user.
+        /// </summary>
+        /// <param name="id">The ID of the recipe to delete.</param>
+        /// <returns>No content if the deletion is successful.</returns>
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteRecipe(int id)
         {
-            // Get the current user ID
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
             {
                 return Unauthorized();
@@ -277,7 +278,6 @@ namespace api.Controllers
                 return NotFound();
             }
 
-            // Check if the user is the author of the recipe
             if (recipe.UserId != userId)
             {
                 return Forbid();
@@ -289,13 +289,25 @@ namespace api.Controllers
             return NoContent();
         }
 
-        // POST: api/Recipe/5/save
+        /// <summary>
+        /// Saves a recipe for the authenticated user.
+        /// </summary>
+        /// <param name="id">The ID of the recipe to save.</param>
+        /// <returns>No content if the save operation is successful.</returns>
         [HttpPost("{id}/save")]
         [Authorize]
         public async Task<IActionResult> SaveRecipe(int id)
         {
-            // Get the current user ID
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users
+                .Include(u => u.SavedRecipes)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
             {
                 return Unauthorized();
             }
@@ -306,85 +318,79 @@ namespace api.Controllers
                 return NotFound();
             }
 
-            // Check if recipe is already saved
-            var isSaved = await _context.Set<Dictionary<string, object>>("UserSavedRecipes")
-                .AnyAsync(usr => EF.Property<int>(usr, "UserId") == userId && 
-                               EF.Property<int>(usr, "RecipeId") == id);
-
-            if (isSaved)
+            if (user.SavedRecipes?.Any(r => r.Id == id) == true)
             {
-                return BadRequest("Recipe is already saved.");
+                return BadRequest("Recipe already saved");
             }
 
-            // Add the recipe to saved recipes
-            var savedRecipe = new Dictionary<string, object>
-            {
-                ["UserId"] = userId,
-                ["RecipeId"] = id
-            };
+            user.SavedRecipes ??= new List<Recipe>();
+            user.SavedRecipes.Add(recipe);
 
-            _context.Set<Dictionary<string, object>>("UserSavedRecipes").Add(savedRecipe);
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        // DELETE: api/Recipe/5/save
-        [HttpDelete("{id}/save")]
-        [Authorize]
-        public async Task<IActionResult> UnsaveRecipe(int id)
-        {
-            // Get the current user ID
-            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
-            {
-                return Unauthorized();
-            }
-
-            // Check if recipe exists
-            var recipe = await _context.Recipes.FindAsync(id);
-            if (recipe == null)
-            {
-                return NotFound();
-            }
-
-            // Get the saved recipe entry
-            var savedRecipe = await _context.Set<Dictionary<string, object>>("UserSavedRecipes")
-                .FirstOrDefaultAsync(usr => EF.Property<int>(usr, "UserId") == userId && 
-                                         EF.Property<int>(usr, "RecipeId") == id);
-
-            if (savedRecipe == null)
-            {
-                return BadRequest("Recipe is not saved.");
-            }
-
-            // Remove the recipe from saved recipes
-            _context.Set<Dictionary<string, object>>("UserSavedRecipes").Remove(savedRecipe);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // GET: api/Recipe/saved
+        /// <summary>
+        /// Unsaves (removes from saved recipes) a recipe for the authenticated user.
+        /// </summary>
+        /// <param name="id">The ID of the recipe to unsave.</param>
+        /// <returns>No content if the unsave operation is successful.</returns>
+        [HttpDelete("{id}/save")]
+        [Authorize]
+        public async Task<IActionResult> UnsaveRecipe(int id)
+        {
+            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users
+                .Include(u => u.SavedRecipes)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var recipe = user.SavedRecipes?.FirstOrDefault(r => r.Id == id);
+            if (recipe == null)
+            {
+                return NotFound();
+            }
+
+            user.SavedRecipes?.Remove(recipe);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Gets all recipes saved by the authenticated user.
+        /// </summary>
+        /// <returns>A list of saved recipes.</returns>
         [HttpGet("saved")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<RecipeListItemDto>>> GetSavedRecipes()
         {
-            // Get the current user ID
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
             {
                 return Unauthorized();
             }
 
-            // Get the saved recipe IDs for the current user
-            var savedRecipeIds = await _context.Set<Dictionary<string, object>>("UserSavedRecipes")
-                .Where(usr => EF.Property<int>(usr, "UserId") == userId)
-                .Select(usr => EF.Property<int>(usr, "RecipeId"))
-                .ToListAsync();
+            var user = await _context.Users
+                .Include(u => u.SavedRecipes!)
+                    .ThenInclude(r => r.Author)
+                .FirstOrDefaultAsync(u => u.Id == userId);
 
-            // Get the saved recipes
-            var savedRecipes = await _context.Recipes
-                .Include(r => r.Author)
-                .Where(r => savedRecipeIds.Contains(r.Id))
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var recipes = user.SavedRecipes?
                 .Select(r => new RecipeListItemDto
                 {
                     Id = r.Id,
@@ -393,29 +399,30 @@ namespace api.Controllers
                     Description = r.Description,
                     Cuisine = r.Cuisine,
                     CookingTime = r.CookingTime,
-                    AuthorName = r.Author.FullName ?? r.Author.Email,
+                    AuthorName = r.Author?.FullName ?? r.Author?.Email ?? string.Empty,
                     IsSaved = true
                 })
-                .ToListAsync();
+                .ToList() ?? new List<RecipeListItemDto>();
 
-            return savedRecipes;
+            return recipes;
         }
 
-        // GET: api/Recipe/user
-        [HttpGet("user")]
+        /// <summary>
+        /// Gets all recipes created by the authenticated user.
+        /// </summary>
+        /// <returns>A list of the user's created recipes.</returns>
+        [HttpGet("my")]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<RecipeListItemDto>>> GetUserRecipes()
+        public async Task<ActionResult<IEnumerable<RecipeListItemDto>>> GetMyRecipes()
         {
-            // Get the current user ID
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
             {
                 return Unauthorized();
             }
 
-            // Get the recipes created by the current user
-            var userRecipes = await _context.Recipes
-                .Include(r => r.Author)
+            var recipes = await _context.Recipes
                 .Where(r => r.UserId == userId)
+                .Include(r => r.Author)
                 .Select(r => new RecipeListItemDto
                 {
                     Id = r.Id,
@@ -425,11 +432,11 @@ namespace api.Controllers
                     Cuisine = r.Cuisine,
                     CookingTime = r.CookingTime,
                     AuthorName = r.Author.FullName ?? r.Author.Email,
-                    IsSaved = false
+                    IsSaved = false // These are the user's own recipes, not saved recipes
                 })
                 .ToListAsync();
 
-            return userRecipes;
+            return recipes;
         }
 
         private bool RecipeExists(int id)

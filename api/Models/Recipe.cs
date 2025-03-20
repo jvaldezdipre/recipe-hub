@@ -5,6 +5,9 @@ using System.Text.Json;
 
 namespace api.Models
 {
+    /// <summary>
+    /// Represents a recipe in the application.
+    /// </summary>
     public class Recipe
     {
         [Key]
@@ -21,17 +24,17 @@ namespace api.Models
         public int CookingTime { get; set; }
         public int PrepTime { get; set; }
         public string? Cuisine { get; set; }
-
-        // Nutrition Facts (Embedded Value Object)
-        public NutritionFacts? Nutrition { get; set; }
-
-        // Foreign Key for User (Author)
+        public NutritionFacts? NutritionFacts { get; set; }
         public int UserId { get; set; }
         public User Author { get; set; } = null!;
+        public List<User> SavedByUsers { get; set; } = new();
     }
 
-
-    [Owned] // This means that NutritionFacts is a value object and will be embedded in the Recipe entity
+    /// <summary>
+    /// Represents nutrition facts for a recipe. This is an owned entity type that is stored
+    /// within the Recipe table.
+    /// </summary>
+    [Owned]
     public class NutritionFacts
     {
         public int Calories { get; set; }

@@ -31,3 +31,24 @@ Consider caching frequently accessed data
 Deployment
 Prepare for deployment with proper environment variables
 Set up CI/CD pipeline if needed
+
+6. Application Flow
+   User Registration/Login:
+   User registers via /api/Auth/register
+   User logs in via /api/Auth/login and receives JWT token
+   Token is stored by client application
+   Creating Recipes:
+   Authenticated user sends recipe data to /api/Recipe
+   Server validates the data and creates a new recipe
+   Recipe is associated with the current user as the author
+   Browsing Recipes:
+   Anyone can browse all recipes via /api/Recipe
+   Detailed recipe view via /api/Recipe/{id}
+   Current user's recipes available at /api/Recipe/user
+   Saving Recipes:
+   Authenticated user can save other users' recipes via /api/Recipe/{id}/save
+   User can view their saved recipes via /api/Recipe/saved
+   User can unsave recipes via /api/Recipe/{id}/save (DELETE method)
+   Editing/Deleting Recipes:
+   Only the recipe author can update/delete their recipes
+   Server validates user identity before allowing modifications

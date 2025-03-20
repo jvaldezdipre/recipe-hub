@@ -12,7 +12,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace api.Controllers
 {
-
+    /// <summary>
+    /// Controller for handling user authentication operations like registration, login, and user profile.
+    /// </summary>
     [ApiController]// This attribute is used to mark the controller as an API controller
     [Route("api/[controller]")]// This attribute is used to specify the route for the controller
     public class AuthController : ControllerBase
@@ -22,13 +24,22 @@ namespace api.Controllers
         // This is the configuration for the AuthController class
         private readonly IConfiguration _config;
 
-        // This is the constructor for the AuthController class
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthController"/> class.
+        /// </summary>
+        /// <param name="context">The database context.</param>
+        /// <param name="config">The application configuration.</param>
         public AuthController(ApplicationDbContext context, IConfiguration config)
         {
             _context = context;
             _config = config;
         }
 
+        /// <summary>
+        /// Registers a new user in the system.
+        /// </summary>
+        /// <param name="dto">The registration data.</param>
+        /// <returns>User information if registration is successful.</returns>
         [HttpPost("register")]// This attribute is used to specify the route for the register method
         public async Task<IActionResult> Register(UserRegisterDto dto)
         {
@@ -68,6 +79,11 @@ namespace api.Controllers
             return Ok(userDto);
         }
 
+        /// <summary>
+        /// Authenticates a user and generates a JWT token.
+        /// </summary>
+        /// <param name="dto">The login credentials.</param>
+        /// <returns>JWT token and user information if login is successful.</returns>
         [HttpPost("login")] // This attribute is used to specify the route for the login method
         public async Task<IActionResult> Login(UserLoginDto dto)
         {
@@ -97,6 +113,10 @@ namespace api.Controllers
             return Ok(new { Token = token, User = userDto });
         }
 
+        /// <summary>
+        /// Gets the current authenticated user's profile information.
+        /// </summary>
+        /// <returns>The user profile information.</returns>
         [HttpGet("me")]
         [Authorize]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
@@ -125,6 +145,11 @@ namespace api.Controllers
             return userDto;
         }
 
+        /// <summary>
+        /// Generates a JWT token for the specified user.
+        /// </summary>
+        /// <param name="user">The user to generate a token for.</param>
+        /// <returns>A JWT token string.</returns>
         private string GenerateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -154,7 +179,9 @@ namespace api.Controllers
         }
     }
 
-    //These are input DTO classes for user registration and login
+    /// <summary>
+    /// Data Transfer Object for user registration requests.
+    /// </summary>
     public class UserRegisterDto
     {
         public string Email { get; set; } = string.Empty;
@@ -164,6 +191,9 @@ namespace api.Controllers
         public string? Bio { get; set; }
     }
 
+    /// <summary>
+    /// Data Transfer Object for user login requests.
+    /// </summary>
     public class UserLoginDto
     {
         public string Email { get; set; } = string.Empty;

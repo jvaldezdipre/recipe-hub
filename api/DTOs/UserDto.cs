@@ -1,6 +1,9 @@
 namespace api.DTOs
 {
-    //This is the output DTO class for the user
+    /// <summary>
+    /// Data Transfer Object for User information. Used when returning user data through the API
+    /// to exclude sensitive information like passwords.
+    /// </summary>
     public class UserDto
     {
         public int Id { get; set; }
