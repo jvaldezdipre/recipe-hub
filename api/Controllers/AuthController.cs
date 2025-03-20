@@ -8,6 +8,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using BCrypt.Net;
 using api.DTOs;
+using Microsoft.AspNetCore.Authorization;
+
 namespace api.Controllers
 {
 
@@ -64,7 +66,6 @@ namespace api.Controllers
 
 
             return Ok(userDto);
-            // return Ok("User registered successfully"); // Return a success message
         }
 
         [HttpPost("login")] // This attribute is used to specify the route for the login method
@@ -80,6 +81,52 @@ namespace api.Controllers
             }
 
             // Generate JWT token
+            var token = GenerateJwtToken(user);
+
+            // Return UserDto with the token
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName ?? string.Empty,
+                ProfilePicture = user.ProfilePicture,
+                Bio = user.Bio
+            };
+
+            // Return the JWT token and user data
+            return Ok(new { Token = token, User = userDto });
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<ActionResult<UserDto>> GetCurrentUser()
+        {
+            // Get the current user ID from the claims
+            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName ?? string.Empty,
+                ProfilePicture = user.ProfilePicture,
+                Bio = user.Bio
+            };
+
+            return userDto;
+        }
+
+        private string GenerateJwtToken(User user)
+        {
             var tokenHandler = new JwtSecurityTokenHandler();
             // Get the key for the JWT token
             var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
@@ -93,7 +140,7 @@ namespace api.Controllers
                     new Claim(ClaimTypes.Email, user.Email) // Add the user's email as a claim
                     // Add more claims if needed (e.g., roles)  
                 }),
-                Expires = DateTime.UtcNow.AddHours(1), // Set the expiration time for the JWT token
+                Expires = DateTime.UtcNow.AddDays(7), // Set the expiration time for the JWT token (7 days)
                 Issuer = _config["Jwt:Issuer"], // Set the issuer for the JWT token
                 Audience = _config["Jwt:Audience"], // Set the audience for the JWT token
                 // Set the signing credentials for the JWT token
@@ -103,20 +150,7 @@ namespace api.Controllers
             // Create the JWT token
             var token = tokenHandler.CreateToken(tokenDescriptor);
             // Write the JWT token to a string
-            var tokenString = tokenHandler.WriteToken(token);
-
-            // Return UserDto with the token
-            var userDto = new UserDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName ?? string.Empty,
-                ProfilePicture = user.ProfilePicture,
-                Bio = user.Bio
-            };
-
-            // Return the JWT token
-            return Ok(new { Token = tokenString });
+            return tokenHandler.WriteToken(token);
         }
     }
 

@@ -25,7 +25,7 @@ namespace api.Controllers
         {
             // Get the current user ID if authenticated
             int? currentUserId = null;
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity?.IsAuthenticated == true)
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
@@ -70,7 +70,7 @@ namespace api.Controllers
 
             // Get the current user ID if authenticated
             int? currentUserId = null;
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity?.IsAuthenticated == true)
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
