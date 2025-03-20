@@ -26,6 +26,5 @@ namespace api.Models
         // Relationships
         public List<Recipe> Recipes { get; set; } = new();
         public List<Recipe> SavedRecipes { get; set; } = new();
-        public List<Cookbook> Cookbooks { get; set; } = new();
     }
 } 

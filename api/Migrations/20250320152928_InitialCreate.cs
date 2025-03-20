@@ -1,12 +1,11 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class FixedCascadeIssue : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,27 +25,6 @@ namespace api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Cookbooks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Cookbooks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Cookbooks_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -82,56 +60,6 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CookbookRecipes",
-                columns: table => new
-                {
-                    CookbookId = table.Column<int>(type: "int", nullable: false),
-                    RecipesId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CookbookRecipes", x => new { x.CookbookId, x.RecipesId });
-                    table.ForeignKey(
-                        name: "FK_CookbookRecipes_Cookbooks_CookbookId",
-                        column: x => x.CookbookId,
-                        principalTable: "Cookbooks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CookbookRecipes_Recipes_RecipesId",
-                        column: x => x.RecipesId,
-                        principalTable: "Recipes",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Ratings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Score = table.Column<int>(type: "int", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RecipeId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ratings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Ratings_Recipes_RecipeId",
-                        column: x => x.RecipeId,
-                        principalTable: "Recipes",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Ratings_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserSavedRecipes",
                 columns: table => new
                 {
@@ -155,26 +83,6 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CookbookRecipes_RecipesId",
-                table: "CookbookRecipes",
-                column: "RecipesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Cookbooks_UserId",
-                table: "Cookbooks",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ratings_RecipeId",
-                table: "Ratings",
-                column: "RecipeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ratings_UserId",
-                table: "Ratings",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Recipes_UserId",
                 table: "Recipes",
                 column: "UserId");
@@ -189,16 +97,7 @@ namespace api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CookbookRecipes");
-
-            migrationBuilder.DropTable(
-                name: "Ratings");
-
-            migrationBuilder.DropTable(
                 name: "UserSavedRecipes");
-
-            migrationBuilder.DropTable(
-                name: "Cookbooks");
 
             migrationBuilder.DropTable(
                 name: "Recipes");

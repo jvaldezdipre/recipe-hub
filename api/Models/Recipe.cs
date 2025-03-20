@@ -25,9 +25,6 @@ namespace api.Models
         // Nutrition Facts (Embedded Value Object)
         public NutritionFacts? Nutrition { get; set; }
 
-        // Ratings
-        public List<Rating> Ratings { get; set; } = new();
-
         // Foreign Key for User (Author)
         public int UserId { get; set; }
         public User Author { get; set; } = null!;
