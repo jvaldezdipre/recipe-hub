@@ -1,11 +1,13 @@
-using Microsoft.EntityFrameworkCore;
 using api.Data;
+using api.Models;
+using api.DTOs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+using System.Text;
+using Swashbuckle.AspNetCore.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -105,6 +107,9 @@ if (app.Environment.IsDevelopment())
         var services = scope.ServiceProvider;
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.EnsureCreated();
+        
+        // Seed the database with sample data
+        DbSeeder.SeedData(context);
     }
 }
 
