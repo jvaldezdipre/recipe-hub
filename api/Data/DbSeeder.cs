@@ -42,7 +42,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Spaghetti Carbonara",
-                    Image = "https://images.unsplash.com/photo-1600803907087-f56d462fd26b?w=600",
+                    Image = "https://source.unsplash.com/featured/?pasta,spaghetti",
                     Description = "Classic Italian pasta dish made with eggs, cheese, pancetta, and black pepper.",
                     Ingredients = new List<string>
                     {
@@ -81,7 +81,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Mushroom Risotto",
-                    Image = "https://images.unsplash.com/photo-1633964913295-ceb43826e7cd?w=600",
+                    Image = "https://source.unsplash.com/featured/?risotto,mushroom",
                     Description = "Creamy Italian rice dish with mushrooms and Parmesan cheese.",
                     Ingredients = new List<string>
                     {
@@ -126,7 +126,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Tiramisu",
-                    Image = "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600",
+                    Image = "https://source.unsplash.com/featured/?tiramisu,dessert",
                     Description = "Classic Italian dessert with layers of coffee-soaked ladyfingers and mascarpone cream.",
                     Ingredients = new List<string>
                     {
@@ -166,7 +166,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Margherita Pizza",
-                    Image = "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=600",
+                    Image = "https://source.unsplash.com/featured/?pizza,margherita",
                     Description = "Classic Neapolitan pizza with tomatoes, mozzarella, and basil.",
                     Ingredients = new List<string>
                     {
@@ -204,7 +204,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Minestrone Soup",
-                    Image = "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600",
+                    Image = "https://source.unsplash.com/featured/?soup,minestrone",
                     Description = "Hearty Italian vegetable soup with beans and pasta.",
                     Ingredients = new List<string>
                     {
@@ -257,7 +257,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Thai Green Curry",
-                    Image = "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600",
+                    Image = "https://source.unsplash.com/featured/?curry,thai",
                     Description = "Aromatic Thai curry with coconut milk, vegetables and your choice of protein.",
                     Ingredients = new List<string>
                     {
@@ -304,7 +304,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Beef Tacos",
-                    Image = "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600",
+                    Image = "https://source.unsplash.com/featured/?tacos,mexican",
                     Description = "Classic Mexican tacos with seasoned ground beef and fresh toppings.",
                     Ingredients = new List<string>
                     {
@@ -354,7 +354,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Chocolate Chip Cookies",
-                    Image = "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=600",
+                    Image = "https://source.unsplash.com/featured/?cookies,chocolate",
                     Description = "Classic homemade chocolate chip cookies - soft in the center and crispy at the edges.",
                     Ingredients = new List<string>
                     {
@@ -398,7 +398,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Chicken Stir Fry",
-                    Image = "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600",
+                    Image = "https://source.unsplash.com/featured/?stirfry,chicken",
                     Description = "Quick and colorful stir fry with chicken and crisp vegetables in a savory sauce.",
                     Ingredients = new List<string>
                     {
@@ -449,7 +449,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Greek Salad",
-                    Image = "https://images.unsplash.com/photo-1626200637212-e7f0eacc9569?w=600",
+                    Image = "https://source.unsplash.com/featured/?salad,greek",
                     Description = "Fresh Mediterranean salad with tomatoes, cucumber, olives, and feta cheese.",
                     Ingredients = new List<string>
                     {
