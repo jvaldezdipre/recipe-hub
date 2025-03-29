@@ -136,6 +136,9 @@ namespace api.Controllers
                 return Unauthorized();
             }
 
+            // Debug log to see the received image value
+            Console.WriteLine($"Received image value: {dto.Image ?? "null"}");
+
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
             {
@@ -229,6 +232,9 @@ namespace api.Controllers
             {
                 return Forbid();
             }
+
+            // Debug log to see the received image value
+            Console.WriteLine($"Updating recipe {id} with image value: {dto.Image ?? "null"}");
 
             recipe.Title = dto.Title;
             recipe.Image = dto.Image;

@@ -1,5 +1,4 @@
 using api.Models;
-using BCrypt.Net;
 
 namespace api.Data
 {
@@ -42,7 +41,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Spaghetti Carbonara",
-                    Image = "https://source.unsplash.com/featured/?pasta,spaghetti",
+                    Image = "https://images.unsplash.com/photo-1533450823749-791a21b4692a?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Classic Italian pasta dish made with eggs, cheese, pancetta, and black pepper.",
                     Ingredients = new List<string>
                     {
@@ -81,7 +80,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Mushroom Risotto",
-                    Image = "https://source.unsplash.com/featured/?risotto,mushroom",
+                    Image = "https://plus.unsplash.com/premium_photo-1694850980302-f568e6de0f6d?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Creamy Italian rice dish with mushrooms and Parmesan cheese.",
                     Ingredients = new List<string>
                     {
@@ -126,7 +125,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Tiramisu",
-                    Image = "https://source.unsplash.com/featured/?tiramisu,dessert",
+                    Image = "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?q=80&w=2873&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Classic Italian dessert with layers of coffee-soaked ladyfingers and mascarpone cream.",
                     Ingredients = new List<string>
                     {
@@ -166,7 +165,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Margherita Pizza",
-                    Image = "https://source.unsplash.com/featured/?pizza,margherita",
+                    Image = "https://images.unsplash.com/photo-1595854341625-f33ee10dbf94?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Classic Neapolitan pizza with tomatoes, mozzarella, and basil.",
                     Ingredients = new List<string>
                     {
@@ -204,7 +203,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Minestrone Soup",
-                    Image = "https://source.unsplash.com/featured/?soup,minestrone",
+                    Image = "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Hearty Italian vegetable soup with beans and pasta.",
                     Ingredients = new List<string>
                     {
@@ -257,7 +256,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Thai Green Curry",
-                    Image = "https://source.unsplash.com/featured/?curry,thai",
+                    Image = "https://plus.unsplash.com/premium_photo-1713089366140-814130d69933?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Aromatic Thai curry with coconut milk, vegetables and your choice of protein.",
                     Ingredients = new List<string>
                     {
@@ -304,7 +303,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Beef Tacos",
-                    Image = "https://source.unsplash.com/featured/?tacos,mexican",
+                    Image = "https://plus.unsplash.com/premium_photo-1661776866702-d671127c2d8b?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Classic Mexican tacos with seasoned ground beef and fresh toppings.",
                     Ingredients = new List<string>
                     {
@@ -354,7 +353,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Chocolate Chip Cookies",
-                    Image = "https://source.unsplash.com/featured/?cookies,chocolate",
+                    Image = "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?q=80&w=2678&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Classic homemade chocolate chip cookies - soft in the center and crispy at the edges.",
                     Ingredients = new List<string>
                     {
@@ -398,7 +397,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Chicken Stir Fry",
-                    Image = "https://source.unsplash.com/featured/?stirfry,chicken",
+                    Image = "https://plus.unsplash.com/premium_photo-1664475934279-2631a25c42ce?q=80&w=2960&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Quick and colorful stir fry with chicken and crisp vegetables in a savory sauce.",
                     Ingredients = new List<string>
                     {
@@ -449,7 +448,7 @@ namespace api.Data
                 new Recipe
                 {
                     Title = "Greek Salad",
-                    Image = "https://source.unsplash.com/featured/?salad,greek",
+                    Image = "https://plus.unsplash.com/premium_photo-1690561082029-0eb2ed65a09f?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     Description = "Fresh Mediterranean salad with tomatoes, cucumber, olives, and feta cheese.",
                     Ingredients = new List<string>
                     {

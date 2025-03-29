@@ -1,10 +1,12 @@
 using api.Data;
+using api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using System.Text;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,9 @@ builder.Services.AddControllers()
         // Handle object cycles in JSON serialization
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
+
+// Register file storage service
+builder.Services.AddScoped<api.Services.IFileStorageService, api.Services.LocalFileStorageService>();
 
 // Add Swagger services
 builder.Services.AddEndpointsApiExplorer();
@@ -121,6 +126,20 @@ if (!app.Environment.IsDevelopment())
 
 // Enable static files serving
 app.UseStaticFiles();
+
+// Ensure Uploads directory exists
+var uploadsPath = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
+if (!Directory.Exists(uploadsPath))
+{
+    Directory.CreateDirectory(uploadsPath);
+}
+
+// Configure a special file provider for uploads
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
 
 // Enable authentication and authorization middleware
 app.UseAuthentication();
